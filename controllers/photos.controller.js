@@ -13,8 +13,16 @@ exports.add = async (req, res) => {
       const fileName = file.path.split('/').slice(-1)[0]; // cut only filename from full path, e.g. C:/test/abc.jpg -> abc.jpg
       const fileNameExtension = fileName.split('.')[1]; // cut extension of the file
       console.log(fileNameExtension)
-        // check file extension
-      if(fileNameExtension === 'jpg' || fileNameExtension === 'gif' || fileNameExtension === 'png'){
+        // check file extension, author & title length
+      if(fileNameExtension === 'jpg' 
+      || 
+          fileNameExtension === 'gif' 
+          || 
+          fileNameExtension === 'png' 
+          &&
+          title.length <= 25 
+          &&
+          author.length <= 50){
         const newPhoto = new Photo({ title, author, email, src: fileName, votes: 0 });
         await newPhoto.save(); // ...save new photo in DB
         res.json(newPhoto);
