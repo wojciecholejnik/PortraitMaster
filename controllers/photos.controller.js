@@ -12,17 +12,32 @@ exports.add = async (req, res) => {
 
       const fileName = file.path.split('/').slice(-1)[0]; // cut only filename from full path, e.g. C:/test/abc.jpg -> abc.jpg
       const fileNameExtension = fileName.split('.')[1]; // cut extension of the file
-      console.log(fileNameExtension)
-        // check file extension, author & title length
+      // new pattern for RegExp checking validation of typed data
+      const pattern = new RegExp(/(<\s*(strong|em)*>(([A-z]|\s)*)<\s*\/\s*(strong|em)>)|(([A-z]|\s|\.)*)/, 'g'); 
+      
+      const authorMatched = author.match(pattern).join(''); // author matched by RegExp pattern
+      const titleMatched = title.match(pattern).join(''); // title matched by RegExp pattern
+      // RegEx pattern for email
+      const emailPattern = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'g');
+      const emailMatched = email.match(emailPattern).join(''); // email matched by RegEx pattern 
+
+        // check file extension, author & title length, author & title - correctness of characters, email validation
       if(fileNameExtension === 'jpg' 
-      || 
+          || 
           fileNameExtension === 'gif' 
           || 
           fileNameExtension === 'png' 
           &&
           title.length <= 25 
           &&
-          author.length <= 50){
+          author.length <= 50
+          &&
+          author.length === authorMatched.length
+          &&
+          title.length === titleMatched.length
+          &&
+          emailMatched
+          ){
         const newPhoto = new Photo({ title, author, email, src: fileName, votes: 0 });
         await newPhoto.save(); // ...save new photo in DB
         res.json(newPhoto);
